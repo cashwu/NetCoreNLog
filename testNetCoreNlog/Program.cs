@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
@@ -14,7 +15,13 @@ namespace testNetCoreNlog
         {
             LogManager.Setup()
                       .SetupExtensions(a => a.RegisterLayoutRenderer<UserNameLayoutRenderer>("user-name"));
-            
+
+            var config = new ConfigurationBuilder()
+                         .AddJsonFile("AppSettings.json")
+                         .Build();
+
+            NLog.Extensions.Logging.ConfigSettingLayoutRenderer.DefaultConfiguration = config;
+
             var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
 
             try
