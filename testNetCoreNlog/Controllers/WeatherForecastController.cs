@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace testNetCoreNlog.Controllers
 {
     [ApiController]
+    [Route("/")]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -26,6 +27,8 @@ namespace testNetCoreNlog.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            UserNameLayoutRenderer.Set("abc123");
+            
             _logger.LogInformation($"{nameof(WeatherForecast)} --- ");
             
             var rng = new Random();
@@ -37,6 +40,8 @@ namespace testNetCoreNlog.Controllers
                                                  Summary = Summaries[rng.Next(Summaries.Length)]
                                              })
                                              .ToArray();
+            
+            UserNameLayoutRenderer.Set("abc456");
             
             _logger.LogInformation($" data --  {JsonSerializer.Serialize(weatherForecasts.Take(2))}");
 
