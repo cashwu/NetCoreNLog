@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
+using NLog.Extensions.Logging;
 using NLog.Web;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
@@ -16,11 +17,11 @@ namespace testNetCoreNlog
             LogManager.Setup()
                       .SetupExtensions(a => a.RegisterLayoutRenderer<UserNameLayoutRenderer>("user-name"));
 
-            var config = new ConfigurationBuilder()
-                         .AddJsonFile("AppSettings.json")
-                         .Build();
-
-            NLog.Extensions.Logging.ConfigSettingLayoutRenderer.DefaultConfiguration = config;
+            // var config = new ConfigurationBuilder()
+            //              .AddJsonFile("AppSettings.json")
+            //              .Build();
+            //
+            // NLog.Extensions.Logging.ConfigSettingLayoutRenderer.DefaultConfiguration = config;
 
             var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
 
@@ -37,7 +38,7 @@ namespace testNetCoreNlog
             }
             finally
             {
-                NLog.LogManager.Shutdown();
+                LogManager.Shutdown();
             }
         }
 
@@ -47,11 +48,13 @@ namespace testNetCoreNlog
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .ConfigureLogging(logging =>
+                .ConfigureLogging((context, logging) =>
                 {
                     logging.ClearProviders();
                     logging.SetMinimumLevel(LogLevel.Trace);
                     logging.AddConsole();
+                    
+                    ConfigSettingLayoutRenderer.DefaultConfiguration = context.Configuration;
                 })
                 .UseNLog();
     }
